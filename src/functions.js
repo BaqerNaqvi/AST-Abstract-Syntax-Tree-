@@ -1,20 +1,13 @@
-//todo: add unit tests
-var https = require("https");
+import https from "https";
 
-export function equals(arg1, arg2) {
-  return arg1 == arg2;
-}
+export const equals = (arg1, arg2) => arg1 === arg2;
 
-export function not(param) {
-  return !param;
-}
+export const not = (param) => !!!param;
 
-export function add(...params) {
-  return params.reduce((a, b) => a + b, 0);
-}
+export const add = (...params) => params.reduce((a, b) => a + b, 0);
 
-export function fetchGet(url) {
-  return new Promise((resolve, reject) => {
+export const fetchGet = (url = "") =>
+  new Promise((resolve, reject) => {
     https
       .get(url, (res) => {
         res.setEncoding("utf8");
@@ -22,12 +15,9 @@ export function fetchGet(url) {
         res.on("data", (chunk) => (body += chunk));
         res.on("end", () => resolve(body));
       })
-      .on("error", (er) => {
-        reject();
+      .on("error", (error) => {
+        reject(error);
       });
   });
-}
 
-export function contains(str, substring) {
-  return str.then((s) => s.includes(substring));
-}
+export const contains = (str, substring) => str && str.includes(substring);

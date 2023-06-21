@@ -1,35 +1,33 @@
-import { add, equals, not, fetchGet, contains } from "./functions";
+import * as functions from "./functions";
 
 export class Evaluator {
-  evaluate(expression) {
-    const { type = "", name = "", parameters = [], value = "" } = expression;
+  async evaluate(expression) {
+    const { type = "", name = "", parameters = [], value } = expression;
 
-    if (equals(type.toLowerCase(), "literal")) return value;
+    if (functions.equals(type, "literal")) {
+      return value;
+    }
+
+    // Evaluate the function arguments asynchronously
+    const args = await Promise.all(
+      parameters.map((param) => this.evaluate(param))
+    );
 
     switch (name) {
       case "add":
-        const allParams = parameters.map((param) => this.evaluate(param));
-        return add(...allParams);
+        return functions.add(...args);
 
       case "equals":
-        return equals(parameters.length, 2)
-          ? equals(this.evaluate(parameters[0]), this.evaluate(parameters[1]))
-          : false;
+        return functions.equals(...args);
 
       case "not":
-        return equals(parameters.length, 1)
-          ? not(this.evaluate(parameters[0]))
-          : false;
+        return functions.not(...args);
 
       case "fetchGet":
-        return equals(parameters.length, 1)
-          ? fetchGet(this.evaluate(parameters[0]))
-          : "";
+        return functions.fetchGet(...args);
 
       case "contains":
-        return equals(parameters.length, 2)
-          ? contains(this.evaluate(parameters[0]), this.evaluate(parameters[1]))
-          : false;
+        return functions.contains(...args);
 
       default:
         throw new Error("Unknown function");
